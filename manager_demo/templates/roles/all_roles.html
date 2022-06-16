@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="card-columns">
+        {% for role in roles %}
+        <div class="card">
+            <div class="card-body">
+                <a href="{{ url_for('roles.edit_role', role_id=role.id) }}"><h5 class="card-title">{{ role.name}}</h5></a>
+                {% if role.description %}
+                    <p>{{role.description}}</p>
+                {% endif %}
+                <h6 class="card-text">
+                    {% for user in role.users %}
+                        <a href="{{ url_for('users.edit_user', user_id=user.id) }}"><span class="badge badge-info">{{ user.full_name|truncate(30) }}</span></a>
+                    {% endfor %}
+                </h6>
+                <p class="card-text"><small class="text-muted">Created : {{ role.date_created.strftime('%Y-%m-%d') }}</small></p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div>
+        <h3><a href="{{ url_for('roles.new_role') }}"><span class="badge badge-success"> + </span></a></h3>
+    </div>
+{% endblock content %}

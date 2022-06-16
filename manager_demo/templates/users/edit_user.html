@@ -1,0 +1,215 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle edit-user-img" src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}">
+        <div class="media-body">
+          <h2 class="account-heading">{{ user.full_name }}</h2>
+          {% for role in user.roles %}
+            <a href="{{url_for('roles.edit_role', role_id=role.id)}}"><span class="badge badge-warning">{{ role.name }}</span></a>
+          {% endfor %}
+          <p class="text-secondary">{{ user.email }}</p>
+        </div>
+      </div>
+        <form method="POST" action="{{ url_for('users.edit_user', user_id=user.id) }}" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <!-- first_name -->
+                <legend class="border-bottom mb-4">Account Info</legend>
+                <div class="form-group">
+                    {{ form.first_name.label(class="form-control-label") }}
+                    {% if form.first_name.errors %}
+                        {{ form.first_name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.first_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.first_name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <!-- last_name -->
+                <div class="form-group">
+                    {{ form.last_name.label(class="form-control-label") }}
+                    {% if form.last_name.errors %}
+                        {{ form.last_name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.last_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.last_name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <!-- email_name -->
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <legend class="border-bottom mb-4">Projects assignated</legend>
+                <div class="form-group">
+                    {% for project in user.projects %}
+                    <a href="{{ url_for('projects.remove_project',next_page=url_for('users.edit_user',user_id=user.id),project_title=project.title,user_id=user.id) }}" style="text-decoration:none">
+                        <span class="badge badge-danger"> - </span></a>
+                        <a href="{{ url_for('projects.edit_project', project_id=project.id) }}"><span class="badge badge-success">{{ project.title }}</span></a>
+                    {% endfor %}
+                    <p><a href="#" data-toggle="modal" data-target="#assignProjectModal"><span class="badge badge-success"> + </span></a></p>
+                </div>
+
+                <legend class="border-bottom mb-4">User roles</legend>
+                <div class="form-group">
+                    {% for role in user.roles %}
+                    <a href="{{ url_for('roles.remove_role',next_page=url_for('users.edit_user',user_id=user.id),role_name=role.name,user_id=user.id) }}" style="text-decoration:none">
+                        <span class="badge badge-danger"> - </span>
+                    </a>
+                    <a href="{{url_for('roles.edit_role', role_id=role.id)}}"><span class="badge badge-warning">{{ role.name }}</span></a>
+                    {% endfor %}
+                    <p><a href="#" data-toggle="modal" data-target="#assignRoleModal"><span class="badge badge-success"> + </span></a></p>
+                </div>
+
+                <!-- change password -->
+                <legend class="border-bottom mb-4">Change password</legend>
+                <div class="form-group">
+                    {{ form.password.label(class="form-control-label") }}
+                    {% if form.password.errors %}
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.confirm_password.label(class="form-control-label") }}
+                    {% if form.confirm_password.errors %}
+                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <!-- image -->
+                <div class="form-group">
+                    {{ form.picture.label() }}
+                    {{ form.picture(class="form-control-file ") }}
+                    {% if form.picture.errors %}
+                        {% for error in form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span></br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <input type="submit" name="image_reset" value="Reset profile image" class="btn btn-outline-info">
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit_update(class="btn btn-outline-info") }}
+                <button type="button" class="btn btn-danger m-1" data-toggle="modal" data-target="#deleteUserModal">
+                    Delete user
+                </button>
+            </div>
+            
+        </form>
+    </div>
+    <!-- Modal assign role-->
+    <div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignRoleModalLabel">Choose a role to assign :</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="">
+                    <div class="form-group" style="margin : 5%; ">
+                        {% if user_role_form.role.errors %}
+                            {{ user_role_form.role(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in user_role_form.role.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ user_role_form.role(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                            {{ user_role_form.submit_role(class="btn btn-outline-success") }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal assign projects-->
+    <div class="modal fade" id="assignProjectModal" tabindex="-1" role="dialog" aria-labelledby="assignProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignProjectModalLabel">Choose a project to assign :</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="">
+                    <div class="form-group" style="margin : 5%; ">
+                        {% if user_project_form.project.errors %}
+                            {{ user_project_form.project(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in user_project_form.project.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ user_project_form.project(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                            {{ user_project_form.submit_project(class="btn btn-outline-success") }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+     <!-- Modal delete -->
+     <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserModalLabel">Delete user {{ user.full_name }} ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <form action="{{url_for('users.delete_user', user_id=user.id, next=url_for('users.all_users'))}}" method="POST">
+                <input class="btn btn-danger" type="submit" value="Delete">
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+{% endblock content %}

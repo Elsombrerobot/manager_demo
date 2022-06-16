@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="card-columns">
+        {% for user in users %}
+        <div class="card">
+            <div class="card-body">
+                <!-- image -->
+                <img class="center" src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}" alt="User image">   
+                <!-- name -->
+                <a href="{{ url_for('users.edit_user', user_id=user.id) }}"><h5 class="card-title">{{ user.full_name }}</h5></a>
+
+                <!-- email -->
+                <!-- name -->
+                <p>{{ user.email}}</p>
+                <!-- role -->
+                <h6 class="card-text">
+                    {% for role in user.roles %}
+                        <a href="{{ url_for('roles.edit_role', role_id=role.id) }}"><span class="badge badge-warning">{{ role.name|truncate(30) }}</span></a>
+                    {% endfor %}
+                </h6>
+
+                <!-- projects -->
+                <h6 class="card-text">
+                    {% for project in user.projects %}
+                        <a href="{{ url_for('projects.edit_project', project_id=project.id) }}"><span class="badge badge-success">{{ project.title|truncate(30)}}</span></a>
+                    {% endfor %}
+                </h6>
+
+                <!-- date created -->
+                <p class="card-text"><small class="text-muted">Registered : {{ user.date_created.strftime('%Y-%m-%d') }}</small></p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div>
+        <h3><a href="{{ url_for('users.new_user') }}"><span class="badge badge-success"> + </span></a></h3>
+    </div>
+        
+{% endblock content %}

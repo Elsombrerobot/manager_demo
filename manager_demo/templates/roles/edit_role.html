@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <div class="media-body">
+          <h2 class="account-heading">{{role.name}}</h2>
+          <p class="text-secondary">{{role.description}}</p>
+          <p class="text-secondary">Level <span class="badge badge-warning"> {{role.level}}</span></p>
+          <p class="text-secondary">Users with this role :
+           {% for user in role.users %}
+                    <a href="{{ url_for('users.edit_user', user_id=user.id) }}" style="text-decoration:none">
+                        <span class="badge badge-info">{{ user.full_name }}</span>
+                    </a>
+            {% endfor %}
+        </p>
+        </div>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+
+                <legend class="border-bottom mb-4">Role info</legend>
+                <div class="form-group">
+                    {{ form.name.label(class="form-control-label") }}
+                    {% if form.name.errors %}
+                        {{ form.name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.level.label(class="form-control-label") }}
+                    {% if form.level.errors %}
+                        {{ form.level(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.level.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.level(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.description.label(class="form-control-label") }}
+                    {% if form.description.errors %}
+                        {{ form.description(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.description(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+                <button type="button" class="btn btn-danger m-1" data-toggle="modal" data-target="#deleteRoleModal">Delete role</button>
+            </div>
+            <form method="post" >
+        </form>
+    </div>
+    <!-- Modal delete -->
+    <div class="modal fade" id="deleteRoleModal" tabindex="-1" role="dialog" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            {% if  role.users|length > 0  %}
+                <h5 class="modal-title" id="deleteRoleModalLabel">Warning, {{ role.users|length }} users are still assignated to this role,
+                                                                 delete {{ role.name }} role ? Users will be unassigned from this role.</h5>
+            {% else %}
+                <h5 class="modal-title" id="deleteRoleModalLabel">Delete {{ role.name }} role ?</h5>
+            {% endif  %}
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <form action="{{url_for('roles.delete_role', role_id=role.id, next=url_for('roles.all_roles'))}}" method="POST">
+                <input class="btn btn-danger" type="submit" value="Delete">
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+{% endblock content %}

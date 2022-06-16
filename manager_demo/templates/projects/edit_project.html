@@ -1,0 +1,169 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <div class="media-body">
+          <h2 class="account-heading">{{project.title}}</h2>
+          <p class="text-secondary">{{project.description}}</p>
+          <p class="text-secondary">Production type : {{project.production_type}}</p>
+          <p class="text-secondary">Frame rate : {{project.fps}}</p>
+        </div>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+
+                <div class="form-group">
+                    {{ form.name.label(class="form-control-label") }}
+                    {% if form.name.errors %}
+                        {{ form.name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <legend class="border-bottom mb-4">Project info</legend>
+                <div class="form-group">
+                    {{ form.title.label(class="form-control-label") }}
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.short_name.label(class="form-control-label") }}
+                    {% if form.short_name.errors %}
+                        {{ form.short_name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.short_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.short_name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.fps.label(class="form-control-label") }}
+
+                    {% if form.fps.errors %}
+                        {{ form.fps(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.fps.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.fps(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.production_type.label(class="form-control-label") }}
+                    
+                    {% if form.production_type.errors %}
+                        {{ form.production_type(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.production_type.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.production_type(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.description.label(class="form-control-label") }}
+                    {% if form.description.errors %}
+                        {{ form.description(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.description(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <legend class="border-bottom mb-4">Users on projet</legend>
+                <div class="form-group">
+                    {% for user in project.users %}
+                    <a href="{{ url_for('projects.remove_project',next_page=url_for('projects.edit_project',project_id=project.id),project_title=project.title,user_id=user.id) }}" style="text-decoration:none">
+                        <span class="badge badge-danger"> - </span></a>
+                        <a href="{{ url_for('users.edit_user', user_id=user.id) }}"><span class="badge badge-info">{{ user.full_name }}</span></a>
+                    {% endfor %}
+                    <p><a href="#" data-toggle="modal" data-target="#assignUserModal"><span class="badge badge-success"> + </span></a></p>
+                </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+                <button type="button" class="btn btn-danger m-1" data-toggle="modal" data-target="#deleteProjectModal">
+                    Delete project
+                </button>
+            </div>
+            <form method="post" >
+        </form>
+    </div>
+    <!-- Modal assign user-->
+    <div class="modal fade" id="assignUserModal" tabindex="-1" role="dialog" aria-labelledby="assignUserModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignUserModal">Choose a user to assign :</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="">
+                    <div class="form-group" style="margin : 5%; ">
+                        {% if project_user_form.user.errors %}
+                            {{ project_user_form.user(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in project_user_form.user.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ project_user_form.user(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                            {{ project_user_form.submit_user(class="btn btn-outline-success") }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal delete -->
+    <div class="modal fade" id="deleteProjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProjectModalLabel">Delete project {{ project.title }} ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <form action="{{url_for('projects.delete_project', project_id=project.id, next=url_for('projects.all_projects'))}}" method="POST">
+                <input class="btn btn-danger" type="submit" value="Delete">
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock content %}
